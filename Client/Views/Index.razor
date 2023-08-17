@@ -1,0 +1,28 @@
+﻿@page "/"
+@using LiveChartsCore.SkiaSharpView.Blazor
+@using BlazorApp1.Client.ViewModels
+
+<div>
+	<button type="button" class="btn btn-primary" @onclick="() => ViewModel.AddItem(new KeyValuePair<TimeSpan, double[]>(DateTime.Now.TimeOfDay, new double[16]))">Add item</button>
+	<button type="button" class="btn btn-primary" @onclick="ToggleConstantChanges">Constant changes</button>
+</div>
+
+<CartesianChart Series="@ViewModel.SeriesCollections"
+				ZoomMode="@LiveChartsCore.Measure.ZoomAndPanMode.X"
+				XAxes="ViewModel.XAxes">
+</CartesianChart>
+
+@code {
+	private bool? _isStreaming = false;
+
+	public ViewModel ViewModel { get; set; } = new();
+
+	public async void ToggleConstantChanges() {
+		_isStreaming = _isStreaming is null ? true : !_isStreaming;
+
+		while (_isStreaming.Value) {
+			ViewModel.AddItem(new KeyValuePair<TimeSpan, double[]>(DateTime.Now.TimeOfDay, new double[16]));
+			await Task.Delay(1000);
+		}
+	}
+}
